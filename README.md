@@ -7,8 +7,9 @@ offline once installed, and nothing in it refers to the external assessment.
 https://YOUR-USERNAME.github.io/CVM-Assessment-Self/
 ```
 
-Hand that URL to your client's own people. Safari → **Share → Add to Home Screen** and it installs as
-its own app, works with no signal, and keeps its answers on that device.
+Hand that URL to your client's own people. It runs in any modern browser, on any device, and can be
+installed to a home screen or desktop so it works with no signal and keeps its answers on
+that device.
 
 ---
 
@@ -62,6 +63,29 @@ dependencies, no server, no database.
 
 ---
 
+## Installing it
+
+It runs in **any modern browser** — Chrome, Edge, Safari, Firefox, on Windows, macOS,
+Android, iPhone or iPad. Installing is optional; it gives the app its own icon, its own
+window, and makes it work with no network.
+
+| Where | How |
+|---|---|
+| **Windows / macOS**, Chrome or Edge | The **install icon** at the right-hand end of the address bar, or ⋮ → *Cast, save and share ▸ Install page as app* |
+| **Android**, Chrome | ⋮ → **Install app** |
+| **iPhone / iPad** | **Safari** → **Share** → **Add to Home Screen** |
+| **Firefox** | No install button; it runs as an ordinary page, and still works offline |
+
+The app puts an **Install this app** button in Setup when the browser offers one, so on
+Chrome and Edge there is nothing to hunt for.
+
+iPhone and iPad are the one place where the browser matters: **no iOS browser except
+Safari can install a web app**. Chrome on iOS is Safari's engine with a different badge
+and Apple does not expose the install to it. That restriction is Apple's, and applies
+nowhere else.
+
+---
+
 ## Turning on GitHub Pages
 
 1. **Settings → Pages**
@@ -75,7 +99,7 @@ Pages must be switched on per repository; it is off by default on a new one.
 ## Releasing a change
 
 1. Replace `index.html`
-2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v7`
+2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v8`
 3. Commit and push
 
 Without step 2, a device that already installed this keeps serving its cached copy.
@@ -89,8 +113,7 @@ No server side. Every score and note stays on the device that entered it and is 
 transmitted, so publishing this publishes the blank tool, not anyone's results. Nothing is
 preloaded — each assessment is a different client.
 
-Deleting the home-screen icon, or "Clear History and Website Data" in Safari, clears the
-answers. Export at the end of every session.
+Deleting the installed app, or clearing site data in the browser, clears the answers. Export at the end of every session.
 
 ---
 

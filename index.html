@@ -570,7 +570,7 @@ const FIXED_LANE = "self";
 const CONSOLIDATOR = /*__CONSOLIDATOR__*/false;
 const KEY = FIXED_LANE ? "cvm-assess-" + FIXED_LANE + "-v1"
           : CONSOLIDATOR ? "cvm-consolidate-v1" : "cvm-assess-v1";
-const BUILD = "2.0 · 14 Aug 2026";   // shown in Setup so you can tell builds apart
+const BUILD = "2.1 · 15 Aug 2026";   // shown in Setup so you can tell builds apart
 const AREA_BY_ID = {};
 DATA.areas.forEach(a => { AREA_BY_ID[a.id] = a; });
 const TOTAL_Q = DATA.areas.reduce((n, a) => n + a.questions.length, 0);
@@ -1667,12 +1667,12 @@ function renderMore() {
         : INSTALLED
         ? `Installed to your home screen and running full screen. The whole app is cached on the device,
            so it opens with no network &mdash; on a plane, at a client site, anywhere.`
-        : `Runs fully offline once installed &mdash; no server, no account.
-      <ol>
-        <li>Open this page in <b>Safari</b> on your iPhone or iPad (not Chrome &mdash; only Safari can install).</li>
-        <li>Tap the <b>Share</b> button, then <b>Add to Home Screen</b>.</li>
-        <li>Launch it from the icon &mdash; full screen, no browser chrome, works offline.</li>
-      </ol>`}
+        : `Runs fully offline once installed &mdash; no server, no account. Works in any modern browser;
+           installing gives it its own icon and makes it work with no network.
+      ${installPrompt ? `<div class="btnrow" style="margin:10px 0 2px">
+        <button class="bigbtn primary" data-act="install">Install this app</button></div>
+        <p style="margin:6px 0 0">Or do it from the browser's own menu, if you prefer.</p>`
+        : installStepsHTML()}`}
       <p style="margin:10px 0 0">Answers are saved on the device as you tap${store.persistent ? "" : " <b>(unavailable in this preview &mdash; export before closing)</b>"}. Export JSON regularly if the assessment spans several sessions.</p>
     </div>
   </div>
@@ -1783,6 +1783,57 @@ const NATIVE = (() => {
   try { return !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.cvmExport); }
   catch (e) { return false; }
 })();
+
+/* ---------- installing, per platform ----------
+   Only iOS restricts this to one browser: no browser on an iPhone may install a
+   web app except Safari, because every iOS browser is Safari's engine wearing a
+   different badge and only Safari exposes Add to Home Screen. Everywhere else —
+   Windows, macOS, Android, ChromeOS — Chrome and Edge install it in one click,
+   and this app runs identically in any modern browser whether it is installed or
+   not. Telling a Windows user to open Safari would be nonsense. */
+const UA = (() => { try { return navigator.userAgent || ""; } catch (e) { return ""; } })();
+const IS_IOS = (() => {
+  try {
+    return /iPad|iPhone|iPod/.test(UA) ||
+           (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // iPadOS reports as a Mac
+  } catch (e) { return false; }
+})();
+const IS_ANDROID = /Android/.test(UA);
+
+/* Chrome and Edge offer the install themselves through this event; when they do,
+   the app can put a real button in front of the person instead of describing a
+   menu they would have to go and find. */
+let installPrompt = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  installPrompt = e;
+  if (ui.tab === "more") render(true);
+});
+window.addEventListener("appinstalled", () => { installPrompt = null; if (ui.tab === "more") render(true); });
+
+function installStepsHTML() {
+  if (IS_IOS) {
+    return `<ol>
+      <li>Open this page in <b>Safari</b>. On an iPhone or iPad this is the only browser that can
+        install a web app &mdash; not a preference, an Apple restriction.</li>
+      <li>Tap <b>Share</b>, then <b>Add to Home Screen</b>.</li>
+      <li>Launch it from the icon &mdash; full screen, no browser bar, works with no signal.</li>
+    </ol>`;
+  }
+  if (IS_ANDROID) {
+    return `<ol>
+      <li>In <b>Chrome</b>, open the <b>\u22ee</b> menu.</li>
+      <li>Tap <b>Install app</b> (or <b>Add to Home screen</b>).</li>
+      <li>Launch it from the icon &mdash; full screen, works with no signal.</li>
+    </ol>`;
+  }
+  return `<ol>
+    <li>In <b>Chrome</b> or <b>Edge</b>, click the <b>install icon</b> at the right-hand end of the
+      address bar &mdash; or the <b>\u22ee</b> menu, then <b>Cast, save and share \u203a Install page as app</b>.</li>
+    <li>It opens in its own window, keeps its own icon, and works with no network.</li>
+    <li>Firefox has no install button; the app still runs perfectly as an ordinary page.</li>
+  </ol>`;
+}
 function haptic(kind) {
   try { window.webkit.messageHandlers.cvmHaptic.postMessage(kind || "light"); } catch (e) { /* web: no-op */ }
 }
@@ -2170,7 +2221,7 @@ function makeReport() {
   // Browser / installed web app: open and print, so the user can Save as PDF.
   const w = window.open("", "_blank");
   if (!w) {
-    // Popup blocked — hand over the HTML file instead; it prints from Safari.
+    // Popup blocked — hand over the HTML file instead; it prints from any browser.
     download(html, name.replace(/\.pdf$/, ".html"), "text/html;charset=utf-8");
     toast("Report saved — open it and print to PDF");
     return;
@@ -2427,6 +2478,16 @@ function handleAct(act, el) {
       setScore(aid, i, state.lane, null);
       refreshCard(card, aid, i); return;
     }
+  }
+  if (act === "install") {
+    if (!installPrompt) { toast("Use your browser's install button"); return; }
+    installPrompt.prompt();
+    installPrompt.userChoice.then(r => {
+      installPrompt = null;
+      toast(r && r.outcome === "accepted" ? "Installing\u2026" : "Not installed");
+      render(true);
+    });
+    return;
   }
   if (act === "toggletable") { ui.showTable = !ui.showTable; render(true); return; }
   if (act === "csv") { download(buildCSV(), reportName("csv"), "text/csv;charset=utf-8"); return; }
