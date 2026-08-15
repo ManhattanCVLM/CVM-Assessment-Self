@@ -99,7 +99,7 @@ Pages must be switched on per repository; it is off by default on a new one.
 ## Releasing a change
 
 1. Replace `index.html`
-2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v8`
+2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v9`
 3. Commit and push
 
 Without step 2, a device that already installed this keeps serving its cached copy.
