@@ -91,6 +91,11 @@ nowhere else.
 The client-facing apps — Self, External and the client app — carry a licence.
 The consolidator does not; it is the operator's own tool.
 
+**This app does nothing until it is licensed.** With no key it shows the questions but will
+not record a score, and says so: *"This assessment needs a licence — contact Manhattan CVLM
+to obtain a licence key."* That is deliberate for the self assessment: a copy that reaches
+someone who was never given a key should not quietly work for a year.
+
 **How it works.** You issue a signed key holding the client's name and an end date,
 using `CVM Licence Keys (KEEP PRIVATE).html`, which never leaves your machine. They paste
 it into **Setup → Licence**. The app verifies the signature against the public key built
@@ -101,9 +106,10 @@ and export and the PDF report still work — nobody's completed assessment is he
 over a date. A new key pasted over the old one unlocks it again, with no rebuild and no
 reinstall.
 
-**With no key at all**, a copy runs until the build's own date (`BUILD_EXPIRES` in
-`build_editions.py`, currently 31 August 2027), then goes read-only the same way. That is
-the backstop for a copy that got away.
+**With no key at all**, this app is locked from the first screen — there is no build-date
+grace period, because there is nothing here anyone should be doing unlicensed. The External
+and client apps take the softer route: they run until the build's own date (`BUILD_EXPIRES`
+in `build_editions.py`, currently 31 August 2027) and then go read-only.
 
 **What it does not do.** It cannot *enforce* anything, and no client-side app can. The code
 is on their machine and the source is readable, so someone willing to edit the app can
@@ -131,7 +137,7 @@ Pages must be switched on per repository; it is off by default on a new one.
 ## Releasing a change
 
 1. Replace `index.html`
-2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v11`
+2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v12`
 3. Commit and push
 
 Without step 2, a device that already installed this keeps serving its cached copy.
