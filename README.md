@@ -196,7 +196,7 @@ storage for that origin and survive the first; the second clears them, so export
 ## Releasing a change
 
 1. Replace `index.html`
-2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v17`
+2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v18`
 3. Commit and push
 
 Without step 2, a device that already installed this keeps serving its cached copy.
