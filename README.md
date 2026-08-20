@@ -23,9 +23,24 @@ the one mistake merging could not detect on its own. Finish, then
 **Compare two self assessments.** *Setup → What this copy is doing → Comparing two
 self assessments.* Import two finished ones — last year's against this year's — and
 every chart, table and figure compares them, **labelled by their own titles**. Scoring
-switches off, and the PDF report becomes available, because a comparison is a thing worth
-sending to someone. A file from an external assessment is refused rather than loaded under
+switches off. A file from the other kind of assessment is refused rather than loaded under
 the wrong name.
+
+---
+
+## The PDF report
+
+**Setup → Create PDF report** produces the full document: cover, executive summary, the
+radar and bar charts, area and subject tables, and the 1–8 scale. It is a report on **one
+assessment**, so it is headed with that assessment's own title rather than the word "self"
+or "external", carries one series, and has no gap column or divergence section — there is
+no second assessment to diverge from.
+
+Optionally it appends every question with its score and notes: thorough, and much longer.
+
+This was missing before build 3.6. The report had been treated as the consolidator's
+output, which was wrong — somebody who has just answered 350 questions should be able to
+print what they did without waiting for it to come back to them.
 
 ---
 
@@ -38,10 +53,12 @@ The word "external" does not appear in this app. Not hidden — absent:
 - one score chip per subject, not a pair with a permanent dash
 - one score column in the CSV, and no gap column
 - one series on the dashboard, no alignment card, no divergence list
+- one series in the PDF report, named by the assessment's own title, with no gap
+  column and no "Largest divergences" section
 
-If a backup holding both assessments is restored here — the only way external scores can
-reach this device — they stay in the file, never appear, and **are dropped from the
-export**. Passing them on would have the consolidator merge answers into an assessment
+If a backup holding both assessments is restored here — the only way the other kind's
+scores can reach this device — they stay in the file, never appear **in the app or in the
+report**, and are dropped from the export. Passing them on would have the consolidator merge answers into an assessment
 this person was never asked to do, credited to them by name.
 
 Comparison is the exception that proves it: two series, but both are self assessments,
@@ -196,7 +213,7 @@ storage for that origin and survive the first; the second clears them, so export
 ## Releasing a change
 
 1. Replace `index.html`
-2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v20`
+2. **Bump `const CACHE` in `sw.js`** — currently `cvm-self-v22`
 3. Commit and push
 
 Without step 2, a device that already installed this keeps serving its cached copy.
